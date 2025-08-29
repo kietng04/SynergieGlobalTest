@@ -23,10 +23,13 @@ public class NewsDbContext : DbContext
         modelBuilder.Entity<User>(entity =>
         {
             entity.HasKey(e => e.Id);
+            entity.Property(e => e.Username).IsRequired().HasMaxLength(50);
             entity.Property(e => e.Email).IsRequired().HasMaxLength(100);
             entity.Property(e => e.Password).IsRequired().HasMaxLength(255);
             entity.Property(e => e.FirstName).IsRequired().HasMaxLength(50);
             entity.Property(e => e.LastName).IsRequired().HasMaxLength(50);
+            entity.Property(e => e.Role).HasMaxLength(50);
+            entity.HasIndex(e => e.Username).IsUnique();
             entity.HasIndex(e => e.Email).IsUnique();
         });
 
@@ -157,10 +160,12 @@ public class NewsDbContext : DbContext
             new User
             {
                 Id = adminUserId,
+                Username = "admin",
                 Email = "admin@newsapi.com",
                 Password = "Admin123!",
                 FirstName = "Admin",
                 LastName = "User",
+                Role = "Admin",
                 CreatedAt = DateTime.UtcNow,
                 UpdatedAt = DateTime.UtcNow
             }

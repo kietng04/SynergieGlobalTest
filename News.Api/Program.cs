@@ -1,5 +1,4 @@
 using News.Api.Services;
-using News.Api.Repositories;
 using News.Api.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -28,7 +27,6 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseCustomMiddleware();
 app.UseHttpsRedirection();
 app.UseCors("AllowAll");
 app.UseAuthorization();

@@ -1,8 +1,7 @@
 using News.Api.Data;
-using News.Api.Middleware;
 using News.Api.Models;
-using News.Api.Repositories;
 using News.Api.Services;
+using News.Api.Repositories;
 using News.Api.Services.Auth;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
@@ -16,9 +15,9 @@ public static class ServiceExtensions
         services.AddDbContext<NewsDbContext>(options =>
             options.UseSqlServer(configuration.GetConnectionString("DefaultConnection")));
 
-        services.AddScoped<IHelloRepository, HelloRepository>();
-
-        services.AddScoped<IHelloService, HelloService>();
+        // User services
+        services.AddScoped<IUserRepository, UserRepository>();
+        services.AddScoped<IUserService, UserService>();
         
         services.AddScoped<IPasswordHashingService, PasswordHashingService>();
         
@@ -29,11 +28,7 @@ public static class ServiceExtensions
         return services;
     }
 
-    public static IApplicationBuilder UseCustomMiddleware(this IApplicationBuilder app)
-    {
-        app.UseMiddleware<ExceptionMiddleware>();
-        return app;
-    }
+    // Custom exception middleware removed; controllers handle exceptions locally
 
     public static IServiceCollection AddSwaggerDocumentation(this IServiceCollection services)
     {
