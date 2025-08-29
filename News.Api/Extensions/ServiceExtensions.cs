@@ -26,6 +26,9 @@ public static class ServiceExtensions
         services.AddScoped<ICollectionArticleRepository, CollectionArticleRepository>();
         services.AddScoped<ICollectionArticleService, CollectionArticleService>();
 
+        services.AddScoped<ICategoryRepository, CategoryRepository>();
+        services.AddScoped<ICategoryService, CategoryService>();
+
         services.AddScoped<IPasswordHashingService, PasswordHashingService>();
         
         services.Configure<JwtConfig>(configuration.GetSection("Jwt"));

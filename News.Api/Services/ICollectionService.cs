@@ -10,6 +10,7 @@ public interface ICollectionService
     Task<Collection?> GetByIdAsync(Guid collectionId, Guid userId);
     Task<List<Collection>> GetByUserAsync(Guid userId);
     Task<(int articleCount, DateTime? lastUpdated)> GetStatsAsync(Guid collectionId, Guid userId);
+    Task<List<Collection>> GetAllCollectionsByUserIdAsync(Guid userId);
 }
 
 

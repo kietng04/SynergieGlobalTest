@@ -9,5 +9,6 @@ public interface ICollectionRepository
     Task<List<Collection>> GetByUserAsync(Guid userId);
     Task UpdateAsync(Collection collection);
     Task DeleteAsync(Collection collection);
-    Task<bool> NameExistsForUserAsync(Guid userId, string name, Guid? excludeId = null);
+
+    Task<List<Collection>> GetAllCollectionsByUserIdAsync(Guid userId);
 }

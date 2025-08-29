@@ -55,4 +55,12 @@ public class CollectionRepository : ICollectionRepository
         }
         return query.AnyAsync();
     }
+
+    public Task<List<Collection>> GetAllCollectionsByUserIdAsync(Guid userId)
+    {
+        return _dbContext.Collections
+            .Where(c => c.UserId == userId)
+            .OrderByDescending(c => c.UpdatedAt)
+            .ToListAsync();
+    }
 }

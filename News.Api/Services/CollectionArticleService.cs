@@ -55,12 +55,40 @@ public class CollectionArticleService : ICollectionArticleService
 
         var created = await _collectionArticleRepository.CreateAsync(entity);
 
-        // Touch parent collection's updated time
         collection.UpdatedAt = DateTime.UtcNow;
         await _collectionRepository.UpdateAsync(collection);
 
         _logger.LogInformation("Added Article {ArticleId} to Collection {CollectionId} by User {UserId}", articleId, collectionId, userId);
         return created;
+    }
+
+    public async Task RemoveArticleAsync(Guid collectionId, Guid articleId, Guid userId)
+    {
+        var collection = await _collectionRepository.GetByIdAsync(collectionId);
+        if (collection == null)
+        {
+            throw new KeyNotFoundException("Collection not found");
+        }
+        if (collection.UserId != userId)
+        {
+            throw new UnauthorizedAccessException("You do not own this collection");
+        }
+        await _collectionArticleRepository.RemoveArticleAsync(collectionId, articleId);
+    }
+
+    public async Task RemoveCollectionAsync(Guid collectionId, Guid userId)
+    {
+        var collection = await _collectionRepository.GetByIdAsync(collectionId);
+        if (collection == null)
+        {
+            throw new KeyNotFoundException("Collection not found");
+        }
+        if (collection.UserId != userId)
+        {
+            throw new UnauthorizedAccessException("You do not own this collection");
+        }
+        await _collectionArticleRepository.RemoveCollectionAsync(collectionId);
+        _logger.LogInformation("Removed Collection {CollectionId} by User {UserId}", collectionId, userId);
     }
 }
 

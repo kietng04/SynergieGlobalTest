@@ -31,11 +31,6 @@ public class CollectionService : ICollectionService
         name = name.Trim();
         description = description?.Trim() ?? string.Empty;
 
-        if (await _collectionRepository.NameExistsForUserAsync(userId, name))
-        {
-            throw new ArgumentException("Collection name already exists for this user");
-        }
-
         var collection = new Collection
         {
             UserId = userId,
@@ -67,11 +62,6 @@ public class CollectionService : ICollectionService
 
         name = name.Trim();
         description = description?.Trim() ?? string.Empty;
-
-        if (await _collectionRepository.NameExistsForUserAsync(userId, name, collectionId))
-        {
-            throw new ArgumentException("Collection name already exists for this user");
-        }
 
         collection.Name = name;
         collection.Description = description;
@@ -127,6 +117,11 @@ public class CollectionService : ICollectionService
         var count = articles.Count;
         DateTime? lastUpdated = articles.Count == 0 ? null : articles.Max(x => x.SavedAt);
         return (count, lastUpdated);
+    }
+
+    public Task<List<Collection>> GetAllCollectionsByUserIdAsync(Guid userId)
+    {
+        return _collectionRepository.GetAllCollectionsByUserIdAsync(userId);
     }
 }
 
