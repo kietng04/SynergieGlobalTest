@@ -9,7 +9,6 @@ public class Article : BaseEntity
     public string Url { get; set; } = string.Empty;
     public Guid CategoryId { get; set; }
     
-    // Navigation properties
     public Category Category { get; set; } = null!;
     public ICollection<CollectionArticle> CollectionArticles { get; set; } = new List<CollectionArticle>();
 }

@@ -15,20 +15,24 @@ public static class ServiceExtensions
         services.AddDbContext<NewsDbContext>(options =>
             options.UseSqlServer(configuration.GetConnectionString("DefaultConnection")));
 
-        // User services
         services.AddScoped<IUserRepository, UserRepository>();
         services.AddScoped<IUserService, UserService>();
         
+        services.AddScoped<IArticleRepository, ArticleRepository>();
+        services.AddScoped<IArticleService, ArticleService>();
+
+        services.AddScoped<ICollectionRepository, CollectionRepository>();
+        services.AddScoped<ICollectionService, CollectionService>();
+        services.AddScoped<ICollectionArticleRepository, CollectionArticleRepository>();
+        services.AddScoped<ICollectionArticleService, CollectionArticleService>();
+
         services.AddScoped<IPasswordHashingService, PasswordHashingService>();
         
-        // JWT Services
         services.Configure<JwtConfig>(configuration.GetSection("Jwt"));
         services.AddScoped<IJwtService, JWTService>();
 
         return services;
     }
-
-    // Custom exception middleware removed; controllers handle exceptions locally
 
     public static IServiceCollection AddSwaggerDocumentation(this IServiceCollection services)
     {

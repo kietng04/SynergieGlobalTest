@@ -64,6 +64,52 @@ public class AuthController : ControllerBase
             });
         }
     }
+
+    [HttpPost("login")]
+    public async Task<ActionResult<ApiResponse<LoginResponseDto>>> Login([FromBody] LoginRequestDto request)
+    {
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(new ApiResponse<LoginResponseDto>
+            {
+                Success = false,
+                Message = "Invalid request data",
+                Errors = ModelState.Values.SelectMany(v => v.Errors.Select(e => e.ErrorMessage)).ToList(),
+                Timestamp = DateTime.UtcNow
+            });
+        }
+
+        try
+        {
+            var result = await _userService.LoginAsync(request);
+            return Ok(new ApiResponse<LoginResponseDto>
+            {
+                Success = true,
+                Data = result,
+                Message = "Login successful",
+                Timestamp = DateTime.UtcNow
+            });
+        }
+        catch (ArgumentException ex)
+        {
+            return Unauthorized(new ApiResponse<LoginResponseDto>
+            {
+                Success = false,
+                Message = ex.Message,
+                Timestamp = DateTime.UtcNow
+            });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error logging in user");
+            return StatusCode(500, new ApiResponse<LoginResponseDto>
+            {
+                Success = false,
+                Message = "An error occurred while processing your request",
+                Timestamp = DateTime.UtcNow
+            });
+        }
+    }
 }
 
 

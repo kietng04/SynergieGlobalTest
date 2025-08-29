@@ -29,6 +29,11 @@ public class UserRepository : IUserRepository
         await _dbContext.SaveChangesAsync();
         return user;
     }
+
+    public Task<User?> GetByUsernameAsync(string username)
+    {
+        return _dbContext.Users.FirstOrDefaultAsync(u => u.Username == username);
+    }
 }
 
 

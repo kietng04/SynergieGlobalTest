@@ -61,6 +61,26 @@ public class UserService : IUserService
             Token = token
         };
     }
+
+    public async Task<LoginResponseDto> LoginAsync(LoginRequestDto request)
+    {
+        var username = request.Username?.Trim() ?? string.Empty;
+        var user = await _userRepository.GetByUsernameAsync(username);
+        if (user == null)
+        {
+            throw new ArgumentException("Invalid username or password");
+        }
+        bool isPasswordValid = _passwordHashingService.VerifyPassword(request.Password, user.Password);
+        if (!isPasswordValid)
+        {
+            throw new ArgumentException("Invalid username or password");
+        }
+        var token = _jwtService.GenerateToken(user);
+        return new LoginResponseDto
+        {
+            Token = token
+        };
+    }
 }
 
 
