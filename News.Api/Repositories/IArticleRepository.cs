@@ -6,6 +6,7 @@ public interface IArticleRepository
 {
     Task<Article?> GetByUrlAsync(string url);
     Task<Article> CreateAsync(Article article);
+    Task<Article> SyncArticleAsync(Article article);
 }
 
 

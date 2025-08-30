@@ -21,6 +21,11 @@ public class CategoryService : ICategoryService
     {
         return _categoryRepository.GetByIdAsync(id);
     }
+
+    public Task<Guid> GetIdByNameAsync(string name)
+    {
+        return _categoryRepository.GetIdByNameAsync(name);
+    }
 }
 
 

@@ -24,6 +24,11 @@ public class CategoryRepository : ICategoryRepository
     {
         return _dbContext.Categories.FirstOrDefaultAsync(c => c.Id == id);
     }
+
+    public Task<Guid> GetIdByNameAsync(string name)
+    {
+        return _dbContext.Categories.Where(c => c.Name == name).Select(c => c.Id).FirstOrDefaultAsync();
+    }
 }
 
 

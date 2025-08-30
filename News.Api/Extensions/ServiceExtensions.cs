@@ -3,6 +3,7 @@ using News.Api.Models;
 using News.Api.Services;
 using News.Api.Repositories;
 using News.Api.Services.Auth;
+using News.Api.Infrastructure.Email;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 
@@ -21,15 +22,20 @@ public static class ServiceExtensions
         services.AddScoped<IArticleRepository, ArticleRepository>();
         services.AddScoped<IArticleService, ArticleService>();
 
+        services.AddScoped<ICategoryRepository, CategoryRepository>();
+        services.AddScoped<ICategoryService, CategoryService>();
+
         services.AddScoped<ICollectionRepository, CollectionRepository>();
         services.AddScoped<ICollectionService, CollectionService>();
         services.AddScoped<ICollectionArticleRepository, CollectionArticleRepository>();
         services.AddScoped<ICollectionArticleService, CollectionArticleService>();
-
-        services.AddScoped<ICategoryRepository, CategoryRepository>();
-        services.AddScoped<ICategoryService, CategoryService>();
+        services.AddScoped<IUserSubscriptionRepository, UserSubscriptionRepository>();
+        services.AddScoped<IUserSubscriptionService, UserSubscriptionService>();
 
         services.AddScoped<IPasswordHashingService, PasswordHashingService>();
+        
+        services.Configure<SmtpSettings>(configuration.GetSection("Smtp"));
+        services.AddScoped<IEmailSender, SmtpEmailSender>();
         
         services.Configure<JwtConfig>(configuration.GetSection("Jwt"));
         services.AddScoped<IJwtService, JWTService>();

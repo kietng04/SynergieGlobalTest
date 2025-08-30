@@ -3,7 +3,19 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using News.Api.Models;
+using Hangfire;
+using News.Api.Infrastructure;
+using News.Api.Data;
+using News.Api.Utils;
+using News.Api.Models.Entities;
+using Microsoft.EntityFrameworkCore;
+using DotNetEnv;
+using Hangfire.SqlServer;
+using Microsoft.Extensions.Options;
 
+var envPath = Path.Combine(Directory.GetCurrentDirectory(), ".env");
+// Console.WriteLine($"load from {envPath}");
+Env.Load(envPath);
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
@@ -11,6 +23,11 @@ builder.Services.AddEndpointsApiExplorer();
 
 builder.Services.AddApplicationServices(builder.Configuration);
 builder.Services.AddSwaggerDocumentation();
+
+var hangfireConnection = builder.Configuration.GetConnectionString("DefaultConnection");
+builder.Services.AddHangfire(config => config.UseSqlServerStorage(hangfireConnection));
+builder.Services.AddHangfireServer();
+builder.Services.AddHttpClient<INewsApiService, NewsApiService>();
 
 var jwtConfig = builder.Configuration.GetSection("Jwt").Get<JwtConfig>() ?? new JwtConfig();
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
@@ -38,14 +55,28 @@ builder.Services.AddCors(options =>
     });
 });
 
+builder.Services.AddTransient<System.Net.Mail.SmtpClient>(provider =>
+{
+    var config =  builder.Configuration.GetSection("Smtp").Get<SmtpSettings>();
+    return new System.Net.Mail.SmtpClient(config.Host, config.Port)
+    {
+        EnableSsl = config.EnableSsl,
+        Credentials = new System.Net.NetworkCredential(
+            config.Username,
+            config.Password)
+    };
+});
+
 var app = builder.Build();
 
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
 
+
+app.UseSwagger();
+app.UseSwaggerUI();
+app.UseHangfireDashboard("/hangfire", new DashboardOptions
+{
+    Authorization = new[] { new AllowAllDashboardAuthorizationFilter() }
+});
 app.UseHttpsRedirection();
 app.UseCors("AllowAll");
 app.UseAuthentication();
@@ -59,4 +90,9 @@ app.MapGet("/health", () => new
     Timestamp = DateTime.UtcNow
 });
 
+RecurringJob.AddOrUpdate<INewsApiService>(
+    "sync-top-news-hourly",
+    service => service.SyncTopNewsToDatabase(),
+    Cron.Hourly
+);
 app.Run();

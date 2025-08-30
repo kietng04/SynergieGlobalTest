@@ -7,6 +7,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="DotNetEnv" Version="*" />
+    <PackageReference Include="Hangfire.AspNetCore" Version="*" />
+    <PackageReference Include="Hangfire.Core" Version="*" />
+    <PackageReference Include="Hangfire.SqlServer" Version="*" />
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="8.0.0" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.0" />

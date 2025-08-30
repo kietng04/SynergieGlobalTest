@@ -26,4 +26,18 @@ public static class Constants
         public const int DefaultPageSize = 10;
         public const int MaxPageSize = 100;
     }
+    public static class NewsApi
+    {
+        public const int LimitNewsArticles = 10;
+        public static readonly List<string> Categories = new List<string>
+        {
+            "business",
+            "entertainment", 
+            "general",
+            "health",
+            "science",
+            "sports",
+            "technology"
+        };
+    }
 }

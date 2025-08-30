@@ -4,7 +4,7 @@ namespace News.Api.Services;
 
 public interface IArticleService
 {
-    Task<Article> AddArticleAsync(Article article);
+    Task<Article> SyncArticleAsync(Article article);
 }
 
 

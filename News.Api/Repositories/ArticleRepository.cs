@@ -24,6 +24,15 @@ public class ArticleRepository : IArticleRepository
         await _dbContext.SaveChangesAsync();
         return article;
     }
+
+    public async Task<Article> SyncArticleAsync(Article article)
+    {
+        if (await GetByUrlAsync(article.Url) == null)
+        {
+            return await CreateAsync(article);
+        }
+        return article;
+    }
 }
 
 
