@@ -5,12 +5,10 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #pragma warning disable CA1814 // Prefer jagged arrays over multidimensional
 
-namespace News.Api.Data.Migrations
+namespace News.Api.Migrations
 {
-    /// <inheritdoc />
     public partial class InitialCreate : Migration
     {
-        /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
@@ -54,6 +52,7 @@ namespace News.Api.Data.Migrations
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Headline = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
                     Summary = table.Column<string>(type: "nvarchar(1000)", maxLength: 1000, nullable: false),
+                    Content = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     PublicationDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     Source = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     Url = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: false),
@@ -156,17 +155,19 @@ namespace News.Api.Data.Migrations
                 columns: new[] { "Id", "CreatedAt", "Description", "Name", "UpdatedAt" },
                 values: new object[,]
                 {
-                    { new Guid("0568ed49-1aea-4e72-b562-4eb4d2064942"), new DateTime(2025, 8, 29, 13, 40, 7, 272, DateTimeKind.Utc).AddTicks(6770), "Latest technology news and updates", "Technology", new DateTime(2025, 8, 29, 13, 40, 7, 272, DateTimeKind.Utc).AddTicks(6772) },
-                    { new Guid("0acc2856-1446-4d15-9e6f-1d2dfe492c95"), new DateTime(2025, 8, 29, 13, 40, 7, 272, DateTimeKind.Utc).AddTicks(6795), "Political news and analysis", "Politics", new DateTime(2025, 8, 29, 13, 40, 7, 272, DateTimeKind.Utc).AddTicks(6796) },
-                    { new Guid("3c96169f-9cf6-463c-8f77-1c24743dd96b"), new DateTime(2025, 8, 29, 13, 40, 7, 272, DateTimeKind.Utc).AddTicks(6941), "Entertainment and celebrity news", "Entertainment", new DateTime(2025, 8, 29, 13, 40, 7, 272, DateTimeKind.Utc).AddTicks(6941) },
-                    { new Guid("903fc465-c2ae-4e36-9158-2e2e6620fdfe"), new DateTime(2025, 8, 29, 13, 40, 7, 272, DateTimeKind.Utc).AddTicks(6931), "Health and wellness news", "Health", new DateTime(2025, 8, 29, 13, 40, 7, 272, DateTimeKind.Utc).AddTicks(6932) },
-                    { new Guid("bff3bd98-2a81-4f86-a341-c449be98ec8e"), new DateTime(2025, 8, 29, 13, 40, 7, 272, DateTimeKind.Utc).AddTicks(6786), "Sports news and updates", "Sports", new DateTime(2025, 8, 29, 13, 40, 7, 272, DateTimeKind.Utc).AddTicks(6786) }
+                    { new Guid("1f4214f5-90da-4cde-8356-87bc15c9648e"), new DateTime(2025, 8, 31, 16, 5, 19, 127, DateTimeKind.Utc).AddTicks(7827), "General news and top stories", "general", new DateTime(2025, 8, 31, 16, 5, 19, 127, DateTimeKind.Utc).AddTicks(7828) },
+                    { new Guid("437f4405-9095-4839-b1a7-c8e27b60df94"), new DateTime(2025, 8, 31, 16, 5, 19, 127, DateTimeKind.Utc).AddTicks(7841), "Latest technology news and updates", "technology", new DateTime(2025, 8, 31, 16, 5, 19, 127, DateTimeKind.Utc).AddTicks(7842) },
+                    { new Guid("9546df9d-b3ac-48af-8484-511029a938d3"), new DateTime(2025, 8, 31, 16, 5, 19, 127, DateTimeKind.Utc).AddTicks(7838), "Sports news and updates", "sports", new DateTime(2025, 8, 31, 16, 5, 19, 127, DateTimeKind.Utc).AddTicks(7839) },
+                    { new Guid("9f9b0d60-e944-4fdb-a4f6-d0d4b2ee9b5a"), new DateTime(2025, 8, 31, 16, 5, 19, 127, DateTimeKind.Utc).AddTicks(7836), "Science news and discoveries", "science", new DateTime(2025, 8, 31, 16, 5, 19, 127, DateTimeKind.Utc).AddTicks(7836) },
+                    { new Guid("a00f423a-bd47-4106-9f07-65ef82103bbd"), new DateTime(2025, 8, 31, 16, 5, 19, 127, DateTimeKind.Utc).AddTicks(7830), "Health and wellness news", "health", new DateTime(2025, 8, 31, 16, 5, 19, 127, DateTimeKind.Utc).AddTicks(7830) },
+                    { new Guid("cf017d08-1bab-44dc-ad99-c45e3562e9b6"), new DateTime(2025, 8, 31, 16, 5, 19, 127, DateTimeKind.Utc).AddTicks(7824), "Entertainment and celebrity news", "entertainment", new DateTime(2025, 8, 31, 16, 5, 19, 127, DateTimeKind.Utc).AddTicks(7824) },
+                    { new Guid("f4471dd1-3361-47be-995b-4c94ad488150"), new DateTime(2025, 8, 31, 16, 5, 19, 127, DateTimeKind.Utc).AddTicks(7820), "Business news, finance, and market updates", "business", new DateTime(2025, 8, 31, 16, 5, 19, 127, DateTimeKind.Utc).AddTicks(7821) }
                 });
 
             migrationBuilder.InsertData(
                 table: "Users",
                 columns: new[] { "Id", "CreatedAt", "Email", "FirstName", "LastName", "Password", "Role", "UpdatedAt", "Username" },
-                values: new object[] { new Guid("1e33a4ee-5859-4e72-9b6a-5c8e94cba60b"), new DateTime(2025, 8, 29, 13, 40, 7, 272, DateTimeKind.Utc).AddTicks(7839), "admin@newsapi.com", "Admin", "User", "Admin123!", "Admin", new DateTime(2025, 8, 29, 13, 40, 7, 272, DateTimeKind.Utc).AddTicks(7839), "admin" });
+                values: new object[] { new Guid("1edab14c-5680-4ef5-9a61-48a3b67d6d68"), new DateTime(2025, 8, 31, 16, 5, 19, 127, DateTimeKind.Utc).AddTicks(8048), "admin@newsapi.com", "Admin", "User", "Admin123!", "Admin", new DateTime(2025, 8, 31, 16, 5, 19, 127, DateTimeKind.Utc).AddTicks(8049), "admin" });
 
             migrationBuilder.CreateIndex(
                 name: "IX_Articles_CategoryId",
@@ -213,7 +214,6 @@ namespace News.Api.Data.Migrations
                 unique: true);
         }
 
-        /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(

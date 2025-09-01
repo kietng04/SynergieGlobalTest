@@ -20,6 +20,22 @@ services:
       start_period: 10s
       timeout: 3s
 
+  redis:
+    image: redis:7-alpine
+    container_name: news-redis
+    command: ["redis-server", "--save", "60", "1", "--loglevel", "warning"]
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "redis-cli ping || exit 1"]
+      interval: 10s
+      timeout: 3s
+      retries: 10
+      start_period: 10s
+
   news-api:
     build:
       context: .
@@ -48,3 +64,4 @@ services:
 
 volumes:
   sqlserver_data:
+  redis_data:

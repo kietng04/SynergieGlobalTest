@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using News.Api.Models.Dtos;
 using News.Api.Services;
+using News.Api.Services.Auth;
 
 namespace News.Api.Controllers;
 
@@ -10,13 +11,16 @@ public class AuthController : ControllerBase
 {
     private readonly IUserService _userService;
     private readonly ILogger<AuthController> _logger;
+    private readonly IJwtService _jwtService;
 
     public AuthController(
         IUserService userService,
-        ILogger<AuthController> logger)
+        ILogger<AuthController> logger,
+        IJwtService jwtService)
     {
         _userService = userService;
         _logger = logger;
+        _jwtService = jwtService;
     }
 
     [HttpPost("register")]
@@ -109,6 +113,29 @@ public class AuthController : ControllerBase
                 Timestamp = DateTime.UtcNow
             });
         }
+    }
+    [HttpPost("validate-token")]
+    public ActionResult<ApiResponse<ValidateTokenResponseDto>> ValidateToken([FromBody] ValidateTokenRequestDto request)
+    {
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(new ApiResponse<ValidateTokenResponseDto>
+            {
+                Success = false,
+                Message = "Invalid request data",
+                Errors = ModelState.Values.SelectMany(v => v.Errors.Select(e => e.ErrorMessage)).ToList(),
+                Timestamp = DateTime.UtcNow
+            });
+        }
+        var principal = _jwtService.ValidateToken(request.Token);
+        var isValid = principal != null;
+        return Ok(new ApiResponse<ValidateTokenResponseDto>
+        {
+            Success = true,
+            Data = new ValidateTokenResponseDto { IsValid = isValid },
+            Message = isValid ? "Valid" : "Invalid",
+            Timestamp = DateTime.UtcNow
+        });
     }
 }
 

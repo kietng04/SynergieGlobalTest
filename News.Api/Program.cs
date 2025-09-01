@@ -12,9 +12,9 @@ using Microsoft.EntityFrameworkCore;
 using DotNetEnv;
 using Hangfire.SqlServer;
 using Microsoft.Extensions.Options;
+using Resend;
 
 var envPath = Path.Combine(Directory.GetCurrentDirectory(), ".env");
-// Console.WriteLine($"load from {envPath}");
 Env.Load(envPath);
 var builder = WebApplication.CreateBuilder(args);
 
@@ -55,18 +55,14 @@ builder.Services.AddCors(options =>
     });
 });
 
-builder.Services.AddTransient<System.Net.Mail.SmtpClient>(provider =>
-{
-    var config =  builder.Configuration.GetSection("Smtp").Get<SmtpSettings>();
-    return new System.Net.Mail.SmtpClient(config.Host, config.Port)
-    {
-        EnableSsl = config.EnableSsl,
-        Credentials = new System.Net.NetworkCredential(
-            config.Username,
-            config.Password)
-    };
-});
 
+builder.Services.AddOptions();
+builder.Services.AddHttpClient<ResendClient>();
+builder.Services.Configure<ResendClientOptions>( o =>
+{
+    o.ApiToken = Environment.GetEnvironmentVariable( "RESEND_APITOKEN" )!;
+} );
+builder.Services.AddTransient<IResend, ResendClient>();
 var app = builder.Build();
 
 

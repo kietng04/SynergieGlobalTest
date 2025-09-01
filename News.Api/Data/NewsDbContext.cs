@@ -112,44 +112,64 @@ public class NewsDbContext : DbContext
         var healthCategoryId = Guid.NewGuid();
         var entertainmentCategoryId = Guid.NewGuid();
         
+        var businessCategoryId = Guid.NewGuid();
+        var generalCategoryId = Guid.NewGuid();
+        var scienceCategoryId = Guid.NewGuid();
+
         modelBuilder.Entity<Category>().HasData(
             new Category
             {
-                Id = techCategoryId,
-                Name = "Technology",
-                Description = "Latest technology news and updates",
-                CreatedAt = DateTime.UtcNow,
-                UpdatedAt = DateTime.UtcNow
-            },
-            new Category
-            {
-                Id = sportsCategoryId,
-                Name = "Sports",
-                Description = "Sports news and updates",
-                CreatedAt = DateTime.UtcNow,
-                UpdatedAt = DateTime.UtcNow
-            },
-            new Category
-            {
-                Id = politicsCategoryId,
-                Name = "Politics",
-                Description = "Political news and analysis",
-                CreatedAt = DateTime.UtcNow,
-                UpdatedAt = DateTime.UtcNow
-            },
-            new Category
-            {
-                Id = healthCategoryId,
-                Name = "Health",
-                Description = "Health and wellness news",
+                Id = businessCategoryId,
+                Name = "business",
+                Description = "Business news, finance, and market updates",
                 CreatedAt = DateTime.UtcNow,
                 UpdatedAt = DateTime.UtcNow
             },
             new Category
             {
                 Id = entertainmentCategoryId,
-                Name = "Entertainment",
+                Name = "entertainment",
                 Description = "Entertainment and celebrity news",
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow
+            },
+            new Category
+            {
+                Id = generalCategoryId,
+                Name = "general",
+                Description = "General news and top stories",
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow
+            },
+            new Category
+            {
+                Id = healthCategoryId,
+                Name = "health",
+                Description = "Health and wellness news",
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow
+            },
+            new Category
+            {
+                Id = scienceCategoryId,
+                Name = "science",
+                Description = "Science news and discoveries",
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow
+            },
+            new Category
+            {
+                Id = sportsCategoryId,
+                Name = "sports",
+                Description = "Sports news and updates",
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow
+            },
+            new Category
+            {
+                Id = techCategoryId,
+                Name = "technology",
+                Description = "Latest technology news and updates",
                 CreatedAt = DateTime.UtcNow,
                 UpdatedAt = DateTime.UtcNow
             }

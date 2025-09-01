@@ -20,7 +20,7 @@ public class EmailController : ControllerBase
     [HttpPost("mock-send")]
     public async Task<ActionResult<ApiResponse<object>>> MockSend()
     {
-        const string to = "nguyenphantuankiet300@gmail.com";
+        const string to = "nguyenphantuankiet299@gmail.com";
         const string subject = "Test email from News.API";
         const string body = "<h3>Hello!</h3><p>This is a mock test email.</p>";
 
@@ -30,17 +30,17 @@ public class EmailController : ControllerBase
             return Ok(new ApiResponse<object>
             {
                 Success = true,
-                Message = "Email sent",
+                Message = "Email sent for: " + to,
                 Timestamp = DateTime.UtcNow
             });
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error sending email");
+            _logger.LogError(ex, "Error sending email: {Message}", ex.Message);
             return StatusCode(500, new ApiResponse<object>
             {
                 Success = false,
-                Message = "Failed to send email",
+                Message = "Failed to send email for: " + to,
                 Errors = new List<string> { ex.Message },
                 Timestamp = DateTime.UtcNow
             });

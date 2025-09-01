@@ -34,6 +34,20 @@ public class UserSubscriptionRepository : IUserSubscriptionRepository
         return entity;
     }
 
+    public Task<List<UserSubscription>> GetByCategoryAsync(Guid categoryId, bool onlyActive = true)
+    {
+        var query = _dbContext.UserSubscriptions
+            .Include(x => x.User)
+            .Where(x => x.CategoryId == categoryId);
+        if (onlyActive)
+        {
+            query = query.Where(x => x.IsActive);
+        }
+        return query
+            .OrderByDescending(x => x.UpdatedAt)
+            .ToListAsync();
+    }
+
     public async Task DeleteAsync(UserSubscription entity)
     {
         _dbContext.UserSubscriptions.Remove(entity);

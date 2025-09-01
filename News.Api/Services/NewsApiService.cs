@@ -3,6 +3,7 @@ using News.Api.Models.Entities;
 using News.Api.Repositories;
 using News.Api.Services;
 using News.Api.Utils;
+using System.Text;
 
 public class NewsApiService : INewsApiService
 {
@@ -12,8 +13,10 @@ public class NewsApiService : INewsApiService
     private readonly List<string> _categories;
     private readonly ICategoryService _categoryService;
     private readonly IArticleService _articleService;
+    private readonly IUserSubscriptionRepository _subscriptionRepository;
+    private readonly IEmailSender _emailSender;
     private Dictionary<string, Guid> _categoryIdMap;
-    public NewsApiService(HttpClient httpClient, Microsoft.Extensions.Configuration.IConfiguration configuration, ICategoryService categoryService, IArticleService articleService)
+    public NewsApiService(HttpClient httpClient, Microsoft.Extensions.Configuration.IConfiguration configuration, ICategoryService categoryService, IArticleService articleService, IUserSubscriptionRepository subscriptionRepository, IEmailSender emailSender)
     {
         _httpClient = httpClient;
         _newsApiUrl = configuration.GetSection("NEWS_API_ENDPOINT").Value ?? string.Empty;
@@ -22,6 +25,8 @@ public class NewsApiService : INewsApiService
         _httpClient.DefaultRequestHeaders.UserAgent.ParseAdd("SynergieGlobalTest-Client/1.0");
         _categoryService = categoryService;
         _articleService = articleService;
+        _subscriptionRepository = subscriptionRepository;
+        _emailSender = emailSender;
         _categoryIdMap = new Dictionary<string, Guid>(StringComparer.OrdinalIgnoreCase);
         mappingCategoryIdMapAsync().Wait();
     }
@@ -49,6 +54,9 @@ public class NewsApiService : INewsApiService
                 continue;
             }
             await handleUpsertArticles(newsApiResponse?.Articles, catId);
+            Console.WriteLine($"Upserted articles for category {categoryName}");
+            await NotifySubscribersAsync(catId);
+            return;
         }
 
     }
@@ -63,12 +71,59 @@ public class NewsApiService : INewsApiService
         }
     }
 
+    private async Task NotifySubscribersAsync(Guid categoryId)
+    {
+        var subscribers = await _subscriptionRepository.GetByCategoryAsync(categoryId, onlyActive: true);
+        if (subscribers.Count == 0)
+        {
+            Console.WriteLine($"No subscribers found for category {categoryId}");
+            return;
+        }
+
+        var topArticles = await _articleService.GetTop10ArticleByCategoryIdAsync(categoryId);
+        if (topArticles.Count == 0)
+        {   
+            Console.WriteLine($"No top articles found for category {categoryId}");
+            return;
+        }
+
+        var today = DateTime.UtcNow.Date;
+        var todaysArticles = topArticles
+            .Where(a => a.PublicationDate.Date == today)
+            .OrderByDescending(a => a.PublicationDate)
+            .ToList();
+        if (todaysArticles.Count == 0)
+        {
+            Console.WriteLine($"No today articles found for category {categoryId}");
+            return;
+        }
+
+        var categoryName = _categoryIdMap.FirstOrDefault(kv => kv.Value == categoryId).Key ?? "news";
+        var sb = new StringBuilder();
+        sb.Append($"<h3>Top {categoryName} news (today)</h3><ol>");
+        foreach (var a in todaysArticles)
+        {
+            sb.Append($"<li><a href='" + a.Url + "'>" + System.Net.WebUtility.HtmlEncode(a.Headline) + "</a> - <i>" + System.Net.WebUtility.HtmlEncode(a.Source) + "</i></li>");
+        }
+        sb.Append("</ol>");
+        var subject = $"Your {categoryName} news digest";
+
+        foreach (var s in subscribers)
+        {
+            var to = s.User.Email;
+            if (string.IsNullOrWhiteSpace(to)) continue;
+            Console.WriteLine($"Sending email to {to}");
+            await _emailSender.SendAsync(to, subject, sb.ToString());
+        }
+    }
+
     private Article convertToArticleEntity(NewsApiArticle article, Guid categoryId)
     {
         return new Article
         {
             Headline = article.Title,
             Summary = article.Description ?? string.Empty,
+            Content = article.Content ?? string.Empty,
             PublicationDate = article.PublishedAt ?? DateTime.UtcNow,
             Source = article.Source.Name,
             Url = article.Url,

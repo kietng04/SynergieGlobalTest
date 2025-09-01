@@ -51,5 +51,16 @@ public class LoginResponseDto
     public string Token { get; set; } = string.Empty;
 }
 
+public class ValidateTokenRequestDto
+{
+    [Required]
+    public string Token { get; set; } = string.Empty;
+}
+
+public class ValidateTokenResponseDto
+{
+    public bool IsValid { get; set; }
+}
+
 
 

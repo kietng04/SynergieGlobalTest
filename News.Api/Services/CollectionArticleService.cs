@@ -90,6 +90,23 @@ public class CollectionArticleService : ICollectionArticleService
         await _collectionArticleRepository.RemoveCollectionAsync(collectionId);
         _logger.LogInformation("Removed Collection {CollectionId} by User {UserId}", collectionId, userId);
     }
+
+    public async Task<List<Article>> GetArticlesByCollectionAsync(Guid collectionId, Guid userId)
+    {
+        var collection = await _collectionRepository.GetByIdAsync(collectionId)
+            ?? throw new KeyNotFoundException("Collection not found");
+        if (collection.UserId != userId)
+        {
+            throw new UnauthorizedAccessException("You do not own this collection");
+        }
+
+        var articles = await _dbContext.CollectionArticles
+            .Where(x => x.CollectionId == collectionId)
+            .OrderByDescending(x => x.SavedAt)
+            .Select(x => x.Article)
+            .ToListAsync();
+        return articles;
+    }
 }
 
 

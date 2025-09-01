@@ -3,10 +3,9 @@ using News.Api.Models;
 using News.Api.Services;
 using News.Api.Repositories;
 using News.Api.Services.Auth;
-using News.Api.Infrastructure.Email;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
-
+using StackExchange.Redis;
+using News.Api.Services.PasswordReset;
 namespace News.Api.Extensions;
 
 public static class ServiceExtensions
@@ -33,10 +32,14 @@ public static class ServiceExtensions
         services.AddScoped<IUserSubscriptionService, UserSubscriptionService>();
 
         services.AddScoped<IPasswordHashingService, PasswordHashingService>();
+        services.AddScoped<IEmailSender, MailResend>();
         
-        services.Configure<SmtpSettings>(configuration.GetSection("Smtp"));
-        services.AddScoped<IEmailSender, SmtpEmailSender>();
-        
+        var redisConnection = Environment.GetEnvironmentVariable("REDIS_CONNECTION")
+                                ?? configuration.GetConnectionString("Redis")
+                                ?? "redis:6379";
+        services.AddSingleton<IConnectionMultiplexer>(_ => ConnectionMultiplexer.Connect(redisConnection));
+        services.AddScoped<IPasswordResetStore, RedisPasswordResetStore>();
+        services.AddScoped<IPasswordResetService, PasswordResetService>();
         services.Configure<JwtConfig>(configuration.GetSection("Jwt"));
         services.AddScoped<IJwtService, JWTService>();
 

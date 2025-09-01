@@ -27,11 +27,27 @@ public class ArticleRepository : IArticleRepository
 
     public async Task<Article> SyncArticleAsync(Article article)
     {
-        if (await GetByUrlAsync(article.Url) == null)
+        var existing = await GetByUrlAsync(article.Url);
+        if (existing == null)
         {
             return await CreateAsync(article);
         }
-        return article;
+
+        existing.Headline = article.Headline;
+        existing.Summary = article.Summary;
+        existing.Content = article.Content;
+        existing.PublicationDate = article.PublicationDate;
+        existing.Source = article.Source;
+        existing.CategoryId = article.CategoryId;
+        existing.UpdatedAt = DateTime.UtcNow;
+
+        await _dbContext.SaveChangesAsync();
+        return existing;
+    }
+
+    public async Task<List<Article>> GetTop10ArticleByCategoryIdAsync(Guid categoryId)
+    {
+        return await _dbContext.Articles.Where(a => a.CategoryId == categoryId).OrderByDescending(a => a.PublicationDate).Take(10).ToListAsync();
     }
 }
 

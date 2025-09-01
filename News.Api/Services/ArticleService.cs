@@ -26,6 +26,11 @@ public class ArticleService : IArticleService
         return _articleRepository.SyncArticleAsync(article);
     }
 
+    public Task<List<Article>> GetTop10ArticleByCategoryIdAsync(Guid categoryId)
+    {
+        return _articleRepository.GetTop10ArticleByCategoryIdAsync(categoryId);
+    }
+
 }
 
 
