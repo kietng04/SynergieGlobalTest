@@ -3,12 +3,12 @@ FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
 
 # Copy csproj and restore dependencies
-COPY ["News.Api/News.Api.csproj", "News.Api/"]
-RUN dotnet restore "News.Api/News.Api.csproj"
+COPY ["News.Api.csproj", "./"]
+RUN dotnet restore "News.Api.csproj"
 
 # Copy everything else and build
 COPY . .
-WORKDIR "/src/News.Api"
+WORKDIR "/src"
 RUN dotnet build "News.Api.csproj" -c Release -o /app/build
 
 # Publish stage
@@ -22,14 +22,14 @@ EXPOSE 8080
 EXPOSE 8081
 
 # Copy csproj and restore dependencies
-COPY ["News.Api/News.Api.csproj", "News.Api/"]
-RUN dotnet restore "News.Api/News.Api.csproj"
+COPY ["News.Api.csproj", "./"]
+RUN dotnet restore "News.Api.csproj"
 
 # Copy everything else
 COPY . .
 
 # For development with hot reload
-ENTRYPOINT ["dotnet", "watch", "run", "--project", "/app/News.Api/News.Api.csproj", "--urls", "http://+:8080"]
+ENTRYPOINT ["dotnet", "watch", "run", "--project", "/app/News.Api.csproj", "--urls", "http://+:8080"]
 
 # Production stage
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS production
