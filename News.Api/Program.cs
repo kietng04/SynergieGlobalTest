@@ -89,6 +89,6 @@ app.MapGet("/health", () => new
 RecurringJob.AddOrUpdate<INewsApiService>(
     "sync-top-news-hourly",
     service => service.SyncTopNewsToDatabase(),
-    Cron.Hourly
+    Cron.Minutely
 );
 app.Run();
