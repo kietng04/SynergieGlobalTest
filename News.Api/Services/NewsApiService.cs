@@ -55,9 +55,20 @@ public class NewsApiService : INewsApiService
             }
             await handleUpsertArticles(newsApiResponse?.Articles, catId);
             Console.WriteLine($"Upserted articles for category {categoryName}");
-            await NotifySubscribersAsync(catId);
         }
 
+    }
+
+    public async Task SendDailyDigestToSubscribers()
+    {
+        foreach (var categoryName in _categories)
+        {
+            if (!_categoryIdMap.TryGetValue(categoryName, out var catId))
+            {
+                continue;
+            }
+            await NotifySubscribersAsync(catId);
+        }
     }
 
     private async Task handleUpsertArticles(List<NewsApiArticle>? articles, Guid categoryId)
