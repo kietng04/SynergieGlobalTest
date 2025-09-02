@@ -56,7 +56,6 @@ public class NewsApiService : INewsApiService
             await handleUpsertArticles(newsApiResponse?.Articles, catId);
             Console.WriteLine($"Upserted articles for category {categoryName}");
             await NotifySubscribersAsync(catId);
-            return;
         }
 
     }
