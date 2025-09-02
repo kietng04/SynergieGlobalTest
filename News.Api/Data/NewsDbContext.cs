@@ -47,6 +47,7 @@ public class NewsDbContext : DbContext
             entity.Property(e => e.Summary).IsRequired().HasMaxLength(1000);
             entity.Property(e => e.Source).IsRequired().HasMaxLength(100);
             entity.Property(e => e.Url).IsRequired().HasMaxLength(500);
+            entity.HasIndex(e => e.Url).IsUnique();
             
             entity.HasOne(e => e.Category)
                   .WithMany(c => c.Articles)

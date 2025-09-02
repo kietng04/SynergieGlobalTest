@@ -88,7 +88,7 @@ public class NewsApiService : INewsApiService
 
         var today = DateTime.UtcNow.Date;
         var todaysArticles = topArticles
-            .Where(a => a.PublicationDate.Date == today)
+            .Where(a => a.PublicationDate.Date <= today)
             .OrderByDescending(a => a.PublicationDate)
             .ToList();
         if (todaysArticles.Count == 0)
