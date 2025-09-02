@@ -107,6 +107,17 @@ public class CollectionArticleService : ICollectionArticleService
             .ToListAsync();
         return articles;
     }
+
+    public async Task<List<Collection>> GetCollectionsByArticleAsync(Guid articleId, Guid userId)
+    {
+        var collections = await _dbContext.CollectionArticles
+            .Where(x => x.ArticleId == articleId)
+            .Select(x => x.Collection)
+            .Where(c => c.UserId == userId)
+            .OrderByDescending(c => c.UpdatedAt)
+            .ToListAsync();
+        return collections;
+    }
 }
 
 

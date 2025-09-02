@@ -96,4 +96,9 @@ RecurringJob.AddOrUpdate<INewsApiService>(
     service => service.SendDailyDigestToSubscribers(),
     Cron.Daily
 );
+RecurringJob.AddOrUpdate<INewsApiService>(
+    "send-weekly-digest",
+    service => service.SendWeeklyDigestToSubscribers(),
+    Cron.Weekly
+);
 app.Run();

@@ -402,6 +402,60 @@ public class CollectionController : ControllerBase
         }
     }
 
+    [HttpDelete("{collectionId}/articles/{articleId}")]
+    public async Task<ActionResult<ApiResponse<object>>> RemoveArticle(Guid collectionId, Guid articleId)
+    {
+        var userId = GetUserIdFromClaims();
+        if (userId == Guid.Empty)
+        {
+            return Unauthorized(new ApiResponse<object>
+            {
+                Success = false,
+                Message = "Unauthorized",
+                Timestamp = DateTime.UtcNow
+            });
+        }
+
+        try
+        {
+            await _collectionArticleService.RemoveArticleAsync(collectionId, articleId, userId);
+            return Ok(new ApiResponse<object>
+            {
+                Success = true,
+                Message = "Article removed from collection",
+                Timestamp = DateTime.UtcNow
+            });
+        }
+        catch (KeyNotFoundException ex)
+        {
+            return NotFound(new ApiResponse<object>
+            {
+                Success = false,
+                Message = ex.Message,
+                Timestamp = DateTime.UtcNow
+            });
+        }
+        catch (UnauthorizedAccessException ex)
+        {
+            return StatusCode(403, new ApiResponse<object>
+            {
+                Success = false,
+                Message = ex.Message,
+                Timestamp = DateTime.UtcNow
+            });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error removing article from collection");
+            return StatusCode(500, new ApiResponse<object>
+            {
+                Success = false,
+                Message = "An error occurred while processing your request",
+                Timestamp = DateTime.UtcNow
+            });
+        }
+    }
+
     private Guid GetUserIdFromClaims()
     {
         var sub = User?.FindFirst("sub")?.Value ?? User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;

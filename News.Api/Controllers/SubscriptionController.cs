@@ -175,6 +175,72 @@ public class SubscriptionController : ControllerBase
         }
     }
 
+    [HttpPatch("{categoryId}")]
+    public async Task<ActionResult<ApiResponse<SubscriptionResponseDto>>> Update(Guid categoryId, [FromBody] UpdateSubscriptionRequestDto request)
+    {
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(new ApiResponse<SubscriptionResponseDto>
+            {
+                Success = false,
+                Message = "Invalid request data",
+                Errors = ModelState.Values.SelectMany(v => v.Errors.Select(e => e.ErrorMessage)).ToList(),
+                Timestamp = DateTime.UtcNow
+            });
+        }
+
+        var userId = GetUserIdFromClaims();
+        if (userId == Guid.Empty)
+        {
+            return Unauthorized(new ApiResponse<SubscriptionResponseDto>
+            {
+                Success = false,
+                Message = "Unauthorized",
+                Timestamp = DateTime.UtcNow
+            });
+        }
+
+        try
+        {
+            var updated = await _subscriptionService.UpdateAsync(userId, categoryId, request.EmailFrequency, request.IsActive);
+            var data = new SubscriptionResponseDto
+            {
+                Id = updated.Id,
+                CategoryId = updated.CategoryId,
+                EmailFrequency = updated.EmailFrequency,
+                IsActive = updated.IsActive,
+                CreatedAt = updated.CreatedAt,
+                UpdatedAt = updated.UpdatedAt
+            };
+            return Ok(new ApiResponse<SubscriptionResponseDto>
+            {
+                Success = true,
+                Data = data,
+                Message = "Subscription updated successfully",
+                Timestamp = DateTime.UtcNow
+            });
+        }
+        catch (KeyNotFoundException ex)
+        {
+            return NotFound(new ApiResponse<SubscriptionResponseDto>
+            {
+                Success = false,
+                Message = ex.Message,
+                Timestamp = DateTime.UtcNow
+            });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error updating subscription");
+            return StatusCode(500, new ApiResponse<SubscriptionResponseDto>
+            {
+                Success = false,
+                Message = "An error occurred while processing your request",
+                Timestamp = DateTime.UtcNow
+            });
+        }
+    }
+
     private Guid GetUserIdFromClaims()
     {
         var sub = User?.FindFirst("sub")?.Value ?? User?.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;

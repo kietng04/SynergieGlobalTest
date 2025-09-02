@@ -60,4 +60,22 @@ public class UserSubscriptionService : IUserSubscriptionService
     {
         return _subscriptionRepository.GetByUserAsync(userId);
     }
+
+    public async Task<UserSubscription> UpdateAsync(Guid userId, Guid categoryId, string? emailFrequency, bool? isActive)
+    {
+        var sub = await _subscriptionRepository.GetAsync(userId, categoryId)
+            ?? throw new KeyNotFoundException("Subscription not found");
+
+        if (!string.IsNullOrWhiteSpace(emailFrequency))
+        {
+            sub.EmailFrequency = emailFrequency.Trim();
+        }
+        if (isActive.HasValue)
+        {
+            sub.IsActive = isActive.Value;
+        }
+        sub.UpdatedAt = DateTime.UtcNow;
+        await _dbContext.SaveChangesAsync();
+        return sub;
+    }
 }

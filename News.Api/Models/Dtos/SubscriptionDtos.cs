@@ -23,3 +23,10 @@ public class SubscriptionResponseDto
     public DateTime CreatedAt { get; set; }
     public DateTime UpdatedAt { get; set; }
 }
+
+public class UpdateSubscriptionRequestDto
+{
+    [StringLength(20)]
+    public string? EmailFrequency { get; set; }
+    public bool? IsActive { get; set; }
+}

@@ -67,7 +67,19 @@ public class NewsApiService : INewsApiService
             {
                 continue;
             }
-            await NotifySubscribersAsync(catId);
+            await NotifySubscribersByFrequencyAsync(catId, "Daily");
+        }
+    }
+
+    public async Task SendWeeklyDigestToSubscribers()
+    {
+        foreach (var categoryName in _categories)
+        {
+            if (!_categoryIdMap.TryGetValue(categoryName, out var catId))
+            {
+                continue;
+            }
+            await NotifySubscribersByFrequencyAsync(catId, "Weekly");
         }
     }
 
@@ -81,9 +93,12 @@ public class NewsApiService : INewsApiService
         }
     }
 
-    private async Task NotifySubscribersAsync(Guid categoryId)
+    private async Task NotifySubscribersByFrequencyAsync(Guid categoryId, string frequency)
     {
         var subscribers = await _subscriptionRepository.GetByCategoryAsync(categoryId, onlyActive: true);
+        subscribers = subscribers
+            .Where(s => string.Equals(s.EmailFrequency, frequency, StringComparison.OrdinalIgnoreCase))
+            .ToList();
         if (subscribers.Count == 0)
         {
             Console.WriteLine($"No subscribers found for category {categoryId}");
@@ -97,26 +112,31 @@ public class NewsApiService : INewsApiService
             return;
         }
 
-        var today = DateTime.UtcNow.Date;
-        var todaysArticles = topArticles
-            .Where(a => a.PublicationDate.Date == today)
+        var utcToday = DateTime.UtcNow.Date;
+        var filteredArticles = frequency.Equals("Weekly", StringComparison.OrdinalIgnoreCase)
+            ? topArticles.Where(a => a.PublicationDate.Date >= utcToday.AddDays(-7)).ToList()
+            : topArticles.Where(a => a.PublicationDate.Date == utcToday).ToList();
+        filteredArticles = filteredArticles
             .OrderByDescending(a => a.PublicationDate)
             .ToList();
-        if (todaysArticles.Count == 0)
+        if (filteredArticles.Count == 0)
         {
-            Console.WriteLine($"No today articles found for category {categoryId}");
+            Console.WriteLine($"No {frequency.ToLower()} articles found for category {categoryId}");
             return;
         }
 
         var categoryName = _categoryIdMap.FirstOrDefault(kv => kv.Value == categoryId).Key ?? "news";
         var sb = new StringBuilder();
-        sb.Append($"<h3>Top {categoryName} news (today)</h3><ol>");
-        foreach (var a in todaysArticles)
+        var titleSuffix = frequency.Equals("Weekly", StringComparison.OrdinalIgnoreCase) ? "(this week)" : "(today)";
+        sb.Append($"<h3>Top {categoryName} news {titleSuffix}</h3><ol>");
+        foreach (var a in filteredArticles)
         {
             sb.Append($"<li><a href='" + a.Url + "'>" + System.Net.WebUtility.HtmlEncode(a.Headline) + "</a> - <i>" + System.Net.WebUtility.HtmlEncode(a.Source) + "</i></li>");
         }
         sb.Append("</ol>");
-        var subject = $"Your {categoryName} news digest";
+        var subject = frequency.Equals("Weekly", StringComparison.OrdinalIgnoreCase)
+            ? $"Your weekly {categoryName} news digest"
+            : $"Your {categoryName} news digest";
 
         foreach (var s in subscribers)
         {
