@@ -120,13 +120,20 @@ public class NewsApiService : INewsApiService
     {
         return new Article
         {
-            Headline = article.Title,
-            Summary = article.Description ?? string.Empty,
+            Headline = Truncate(article.Title, 200),
+            Summary = Truncate(article.Description, 1000),
             Content = article.Content ?? string.Empty,
             PublicationDate = article.PublishedAt ?? DateTime.UtcNow,
-            Source = article.Source.Name,
-            Url = article.Url,
+            Source = Truncate(article?.Source?.Name, 100),
+            Url = Truncate(article.Url, 500),
             CategoryId = categoryId,
         };
+    }
+
+    private static string Truncate(string? value, int maxLength)
+    {
+        if (string.IsNullOrEmpty(value)) return string.Empty;
+        var trimmed = value.Trim();
+        return trimmed.Length <= maxLength ? trimmed : trimmed.Substring(0, maxLength);
     }
 }
