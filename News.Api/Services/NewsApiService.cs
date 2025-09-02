@@ -45,7 +45,7 @@ public class NewsApiService : INewsApiService
 
         foreach (var categoryName in _categories)
         {
-            var url = $"{_newsApiUrl}/top-headlines?country=us&apiKey={_newsApiKey}&category={categoryName}";
+            var url = $"{_newsApiUrl}/top-headlines?country=us&apiKey={_newsApiKey}&category={categoryName}&pageSize=30";
             using var request = new HttpRequestMessage(HttpMethod.Get, url);
             var response = await _httpClient.SendAsync(request);
             var newsApiResponse = await response.Content.ReadFromJsonAsync<NewsApiResponse>();
