@@ -94,7 +94,7 @@ RecurringJob.AddOrUpdate<INewsApiService>(
 RecurringJob.AddOrUpdate<INewsApiService>(
     "send-daily-digest",
     service => service.SendDailyDigestToSubscribers(),
-    Cron.Minutely
+    Cron.Daily
 );
 RecurringJob.AddOrUpdate<INewsApiService>(
     "send-weekly-digest",
