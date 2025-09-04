@@ -115,7 +115,7 @@ public class NewsApiService : INewsApiService
         var utcToday = DateTime.UtcNow.Date;
         var filteredArticles = frequency.Equals("Weekly", StringComparison.OrdinalIgnoreCase)
             ? topArticles.Where(a => a.PublicationDate.Date >= utcToday.AddDays(-7)).ToList()
-            : topArticles.Where(a => a.PublicationDate.Date == utcToday).ToList();
+            : topArticles.Where(a => a.PublicationDate.Date == utcToday || a.PublicationDate.Date == utcToday.AddDays(-1)).ToList();
         filteredArticles = filteredArticles
             .OrderByDescending(a => a.PublicationDate)
             .ToList();
